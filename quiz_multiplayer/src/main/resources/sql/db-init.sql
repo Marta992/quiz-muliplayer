@@ -9,8 +9,7 @@ CREATE TABLE questions (
     option_3 VARCHAR(100) NOT NULL,
     option_4 VARCHAR(100) NOT NULL,
     correct_option TINYINT NOT NULL,
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
 );
 
 CREATE TABLE player (

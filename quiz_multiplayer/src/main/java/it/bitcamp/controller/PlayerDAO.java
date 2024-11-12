@@ -21,10 +21,11 @@ public class PlayerDAO {
 		}
 	}
 	
-	public PlayerEntity addPlayer(String nickname, String password) {
+	public String addPlayer(String nickname, String password) {
 		Session session = factory.openSession();
 		Transaction tx = null;
 		PlayerEntity player = null;
+		String playerId = null;
 		try {
 			// inizio della transazione garantendo l'integrita dei dati
 			tx = session.beginTransaction();
@@ -33,7 +34,7 @@ public class PlayerDAO {
 			player.setPassword(password);
 
 			// salviamo utente sul database e ci faccioamo tornare il valore dell id
-			player = (PlayerEntity) session.save(player);
+			playerId = (String) session.save(player);
 			// confwermiamo la transazione
 			tx.commit();
 
@@ -49,7 +50,7 @@ public class PlayerDAO {
 			session.close();
 
 		}
-		return player;
+		return playerId;
 	}
 	
 	public PlayerEntity getPlayer(String nickname) {

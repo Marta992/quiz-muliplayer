@@ -16,8 +16,7 @@ public class QuestionEntity {
     private String option3;
     private String option4;
     private int correctOption;
-    private int createdBy;
-    private Timestamp createdAt;
+    
 	public int getQuestionId() {
 		return questionId;
 	}
@@ -60,18 +59,8 @@ public class QuestionEntity {
 	public void setCorrectOption(int correctOption) {
 		this.correctOption = correctOption;
 	}
-	public int getCreatedBy() {
-		return createdBy;
-	}
-	public void setCreatedBy(int createdBy) {
-		this.createdBy = createdBy;
-	}
-	public Timestamp getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
+	
+	
 
    
 }
