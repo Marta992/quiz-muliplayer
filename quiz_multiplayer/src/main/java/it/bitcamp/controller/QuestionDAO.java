@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
+
 import it.bitcamp.model.QuestionEntity;
 import old.Question;
 
@@ -32,16 +33,16 @@ public class QuestionDAO {
 			// inizio della transazione garantendo l'integrita dei dati
 			tx = session.beginTransaction();
 			// creazione di una istanza della classe question
+			question = new QuestionEntity();
 			question.setQuestionText(questionText);
-			question.setOption1(option1);
-			question.setOption2(option2);
-			question.setOption3(option3);
-			question.setOption4(option4);
-			question.setCorrectOption(correctOption);
+			question.setCorrectOption(option1);
+			question.setOtherOption1(option2);
+			question.setOtherOption2(option3);
+			question.setOtherOption3(option4);
 
 			// salviamo domanda sul database e ci faccioamo tornare il valore dell id
 			questionId = (Integer) session.save(question);
-			// confwermiamo la transazione
+			// confermiamo la transazione
 			tx.commit();
 
 		} catch (Exception e) {
@@ -87,7 +88,7 @@ public class QuestionDAO {
 		try {
 			tx = session.beginTransaction();
 			//otteniamo tutte le domande QUERY
-			questions = session.createQuery("FROM Question").list();
+			questions = session.createQuery("FROM Question", Question.class).list();
 			tx.commit();
 			
 		} catch (Exception e) {
@@ -100,6 +101,7 @@ public class QuestionDAO {
 		}
 		return questions;
 	}
+	
 	//getRandomQuestions
 	public List<Question> getRandomQuestions(int numQuestions) {
 	    Session session = factory.openSession();
