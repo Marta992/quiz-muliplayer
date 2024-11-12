@@ -11,48 +11,63 @@ import javax.persistence.Table;
 @Table(name = "PLAYER")
 public class PlayerEntity {
 
-	@Id
-	@Column(name = "NICKNAME")
-	private String nickname;
-	
-	@Column(name = "PASSWORD")
-	private String password;
-	
-	@Column(name = "ADMIN")
-	private boolean admin;
+    @Id
+    @Column(name = "NICKNAME")
+    private String nickname;
+    
+    @Column(name = "PASSWORD")
+    private String password;
+    
+    @Column(name = "ADMIN")
+    private boolean admin;
 
-	public PlayerEntity() {
-	}
-	
-	public PlayerEntity(String nickname, String password, boolean admin) {
-		super();
-		this.nickname = nickname;
-		this.password = password;
-		this.admin = admin;
-	}
+    @Column(name = "TOTAL_SCORE")  // Campo per memorizzare il punteggio totale
+    private int totalScore;
 
-	public String getNickname() {
-		return nickname;
-	}
+    public PlayerEntity() {}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
+    public PlayerEntity(String nickname, String password, boolean admin, int totalScore) {
+        this.nickname = nickname;
+        this.password = password;
+        this.admin = admin;
+        this.totalScore = totalScore;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    // Getters and Setters
+    public String getNickname() {
+        return nickname;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
-	public boolean isAdmin() {
-		return admin;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setAdmin(boolean admin) {
-		this.admin = admin;
-	}
-	
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
+    }
+
+    public void addToTotalScore(int score) {
+        this.totalScore += score;  // Aggiunge il nuovo punteggio al punteggio totale
+    }
 }
+

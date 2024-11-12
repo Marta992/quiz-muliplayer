@@ -6,7 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-
+import org.hibernate.query.Query;
 import it.bitcamp.model.QuestionEntity;
 import old.Question;
 
@@ -99,5 +99,27 @@ public class QuestionDAO {
 			session.close();
 		}
 		return questions;
+	}
+	//getRandomQuestions
+	public List<Question> getRandomQuestions(int numQuestions) {
+	    Session session = factory.openSession();
+	    Transaction tx = null;
+	    List<Question> questions = null;
+	    try {
+	        tx = session.beginTransaction();
+	        // Query  getRandomQuestions(5) per ottenere una lista di 5 domande casuali, o un altro numero passato come argomento.
+	        Query<Question> query = session.createQuery("FROM Question ORDER BY RAND()", Question.class);
+	        query.setMaxResults(numQuestions); // Limita il numero di risultati al valore desiderato
+	        questions = query.list();
+	        tx.commit();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        if (tx != null) {
+	            tx.rollback();
+	        }
+	    } finally {
+	        session.close();
+	    }
+	    return questions;
 	}
 }
