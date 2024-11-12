@@ -27,7 +27,6 @@ public class QuizMultiplayer {
         server.createContext("/login", new LoginFormHandler());
         server.start();
         System.out.println("Server avviato su porta 8080");
-        
     }
 	
 	//HANDLER FILE STATICI
