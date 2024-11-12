@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punteggi - Quiz Multiplayer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Quiz Multiplayer</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="accedi.html">Accedi</a></li>
+                <li class="nav-item"><a class="nav-link" href="iscriviti.html">Iscriviti</a></li>
+                <li class="nav-item"><a class="nav-link" href="game.html">Gioca</a></li>
+                <li class="nav-item"><a class="nav-link active" href="punteggi.html">Punteggi</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container vh-100 d-flex justify-content-center align-items-center">
+        <div class="w-75 p-4 text-center">
+            <h2 class="text-light">Classifica Punteggi</h2>
+
+            <div class="card bg-dark text-white my-4">
+                <div class="card-header">
+                    <h3>Punteggi del Giorno</h3>
+                </div>
+                <ul id="dailyScores" class="list-group list-group-flush">
+                    <!-- I punteggi giornalieri saranno caricati qui tramite JavaScript -->
+                </ul>
+            </div>
+
+            <div class="card bg-dark text-white my-4">
+                <div class="card-header">
+                    <h3>Punteggi Mensili</h3>
+                </div>
+                <ul id="monthlyScores" class="list-group list-group-flush">
+                    <!-- I punteggi mensili saranno caricati qui tramite JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funzione per caricare i punteggi dal backend
+        async function loadScores() {
+            try {
+                const response = await fetch('/punteggi');
+                const data = await response.json();
+    
+                const dailyScoresList = document.getElementById("dailyScores");
+                const monthlyScoresList = document.getElementById("monthlyScores");
+    
+                // Carica i punteggi giornalieri
+                data.dailyScores.forEach((score) => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item bg-dark text-white";
+                    li.textContent = `${score.nickname}: ${score.score} punti`;
+                    dailyScoresList.appendChild(li);
+                });
+    
+                // Carica i punteggi mensili
+                data.monthlyScores.forEach((score) => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item bg-dark text-white";
+                    li.textContent = `${score.nickname}: ${score.score} punti`;
+                    monthlyScoresList.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Errore nel caricamento dei punteggi:", error);
+            }
+        }
+    
+        // Carica i punteggi al caricamento della pagina
+        window.addEventListener('load', loadScores);
+    </script>
+    
+</body>
+</html>
