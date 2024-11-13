@@ -86,7 +86,7 @@ public class QuestionDAO {
 		List<QuestionEntity> questions = null;
 		try {
 			tx = session.beginTransaction();
-			//otteniamo tutte le domande QUERY
+			//query HQL:otteniamo tutte le istanze di QuestionEntity 
 			questions = session.createQuery("FROM QuestionEntity", QuestionEntity.class).list();
 			tx.commit();
 			

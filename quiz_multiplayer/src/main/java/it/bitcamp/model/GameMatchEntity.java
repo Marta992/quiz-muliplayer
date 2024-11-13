@@ -25,6 +25,7 @@ public class GameMatchEntity {
     @Column(name = "SCORE")
     private int score; 
     
+    //impostare automaticamente un valore di data e ora quando un nuovo record viene creato
     @CreationTimestamp
     @Column(name = "DATE_PLAYED")
     private LocalDateTime datePlayed; 

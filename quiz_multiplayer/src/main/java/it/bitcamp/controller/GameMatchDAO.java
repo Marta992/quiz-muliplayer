@@ -16,9 +16,9 @@ import it.bitcamp.model.GameMatchEntity;
 import it.bitcamp.model.PlayerEntity;
 
 public class GameMatchDAO {
-	
+
 	private static SessionFactory factory;
-	
+
 	static {
 		try {
 			// configuriamo la factory con il file di configurazione di hibernate
@@ -46,7 +46,7 @@ public class GameMatchDAO {
 			PlayerEntity player = session.get(PlayerEntity.class, nickname);
 			if (player != null) {
 				player.setTotalScore(player.getTotalScore() + score);
-				session.update(player); 
+				session.update(player);
 			}
 			// confermiamo la transazione
 			tx.commit();
@@ -65,27 +65,28 @@ public class GameMatchDAO {
 		return matchId;
 	}
 
+//ottenere tutte le partite salvate nel database hql
 	public List<GameMatchEntity> getAllGameMatch() {
 		Session session = factory.openSession();
 		Transaction tx = null;
 		List<GameMatchEntity> matches = new ArrayList<>();
 		try {
 			tx = session.beginTransaction();
-			//otteniamo tutti gli utenti QUERY
+			// otteniamo tutti gli utenti QUERY
 			matches = session.createQuery("FROM GameMatchEntity", GameMatchEntity.class).list();
 			tx.commit();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (tx != null) {
 				tx.rollback();
 			}
-		}finally {
+		} finally {
 			session.close();
 		}
 		return matches;
 	}
-	
+
 	public List<GameMatchEntity> getDailyGameMatch() {
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -99,7 +100,7 @@ public class GameMatchDAO {
 
 			// Creiamo una query per ottenere i punteggi di oggi
 			String hql = "SELECT m FROM GameMatchEntity m WHERE DATE(m.datePlayed) = :today";
-
+            //passo la data di oggi alla query
 			Query<GameMatchEntity> query = session.createQuery(hql, GameMatchEntity.class);
 			query.setParameter("today", today);
 

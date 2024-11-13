@@ -43,7 +43,7 @@ public class PlayerDAO {
 		} catch (Exception e) {
 			// annullamento della transazione
 			e.printStackTrace();
-			// altro codice
+			
 			if (tx != null) {
 				tx.rollback(); // annullare transazione
 			}

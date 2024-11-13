@@ -63,14 +63,15 @@
 		let questions = [
             // Aggiungi altre domande o caricale da un backend in futuro
         ];
-		handleQuestions();
+		handleQuestions(); //funzione che carica le domande e le risposte
 
-        let currentQuestionIndex = 0;
+        let currentQuestionIndex = 0; //domanda corrente
         let score = 0;
-        let timeLeft = 10;
-        let timerInterval;
+        let timeLeft = 10; //tempo che rimane per rispondere
+        let timerInterval; 
         let hasAnswered = false;
         
+        //estrae domande dalla tabella nascosta
         function handleQuestions(){
 			questions = [];
 			const questionsRaws = document.getElementById("questions").childNodes
@@ -160,6 +161,7 @@
             document.getElementById("score").innerHTML = `Punteggio finale: <span id="scoreValue">${score}</span>`;
             document.getElementById("playAgainBtn").style.display = "block";
             
+            //recupera il nickname dal localStorage + score tramite scoreForm
             const nickname = localStorage.getItem("nickname");
 			document.getElementById("nickname").value = nickname;
             document.getElementById("finalScore").value = score;

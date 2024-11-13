@@ -24,3 +24,19 @@ CREATE TABLE GAME_MATCH (
     DATE_PLAYED TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (NICKNAME) REFERENCES PLAYER(NICKNAME)
 );
+
+INSERT INTO PLAYER (NICKNAME, PASSWORD_HASH, IS_ADMIN, TOTAL_SCORE) VALUES
+("Marta", "$2a$10$cZt8jNSCTDRLStsVWX86vuuYnSQTktqWy9NmtytD3d6/hLzJUdjGW", 1, 0),
+("Paolo", "$2a$10$BwovJklOxaloflhAqPSVPuK8Qz9nPEMwmOYYyhvccp9xNvpe3TaJG", 0, 0;
+
+INSERT INTO QUESTION (QUESTION_TEXT, CORRECT_OPTION, OTHER_OPTION_1, OTHER_OPTION_2, OTHER_OPTION_3) VALUES
+('Chi è il fondatore della casa di Grifondoro?', 'Godric Grifondoro', 'Severus Piton', 'Salazar Serpeverde', 'Helga Tassorosso'),
+('Qual è il nome del gioco che si gioca su scope nel mondo di Harry Potter?', 'Quidditch', 'Quodpot', 'Scacchi magici', 'Calcio volanti'),
+('Cosa regala Hagrid a Harry per il suo undicesimo compleanno?', 'Un gufo', 'Una scopa', 'Un libro', 'Un cane'),
+('Qual è il vero nome di Lord Voldemort?', 'Tom Riddle', 'Salazar Serpeverde', 'Sirius Black', 'Albus Silente'),
+('Qual è il nome della scuola frequentata da Harry Potter?', 'Hogwarts', 'Beauxbatons', 'Durmstrang', 'Ilvermorny'),
+('Qual è l''animale che rappresenta la casa di Corvonero?', 'Un''aquila', 'Un leone', 'Un cervo', 'Un cane'),
+('Qual è il nome del negozio di bacchette magiche di Diagon Alley?', 'Olivanders', 'Fred & George', 'Weasleys'' Wizard Wheezes', 'La bottega delle pozioni'),
+('Chi ha ucciso Sirius Black?', 'Bellatrix Lestrange', 'Lucius Malfoy', 'Severus Piton', 'Nagini'),
+('Qual è il nome dell''incantesimo che fa levitare gli oggetti?', 'Wingardium Leviosa', 'Lumos', 'Accio', 'Petrificus Totalus'),
+('Chi è il professor di Difesa contro le Arti Oscure nel quinto anno di Harry?', 'Dolores Umbridge', 'Gilderoy Lockhart', 'Severus Piton', 'Remus Lupin');

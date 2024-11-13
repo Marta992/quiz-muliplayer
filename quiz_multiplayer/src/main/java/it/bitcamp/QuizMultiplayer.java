@@ -47,7 +47,7 @@ public class QuizMultiplayer {
 		System.out.println("Server avviato su porta 8080");
 	}
 
-	// HANDLER FILE STATICI
+	// HANDLER FILE STATICI Quando viene richiesta la root ("/"), restituisce il file index.html. Se il file richiesto non esiste, restituisce un errore 404.
 	static class StaticFileHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
@@ -157,7 +157,7 @@ public class QuizMultiplayer {
 		}
 	}
 
-	// HANDLER CREATE QUESTION
+	// HANDLER CREATE QUESTION Quando vengono inviati i dati tramite una richiesta POST, la domanda viene aggiunta al database.
 	static class CreateQuestionFormHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
@@ -188,7 +188,7 @@ public class QuizMultiplayer {
 		}
 	}
 
-	// HANDLER DELETE QUESTION
+	// HANDLER DELETE QUESTION 
 	static class DeleteQuestionFormHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
@@ -230,7 +230,7 @@ public class QuizMultiplayer {
 		}
 	}
 
-	// HANDLER PUNTEGGI GESTORE
+	// HANDLER PUNTEGGI GESTORE Le domande vengono prese dal database e mostrate dinamicamente nella pagina HTML.
 	static class AdminGameHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
@@ -246,7 +246,7 @@ public class QuizMultiplayer {
 		}
 	}
 
-	// HANDLER LOGIN
+	// HANDLER LOGIN  Quando un giocatore termina il quiz, il punteggio viene salvato nel database tramite una richiesta POST.
 	static class AddScoreHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
@@ -256,7 +256,7 @@ public class QuizMultiplayer {
 				String formData = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
 				// Elabora i parametri
-				Map<String, String> parameters = parseFormData(formData);
+				Map<String, String> parameters = parseFormData(formData);//li converte in una mappa di coppie chiave-valore
 				String nickname = parameters.get("nickname");
 				int score = Integer.parseInt(parameters.get("score"));
 
@@ -353,7 +353,7 @@ public class QuizMultiplayer {
 			response404(exchange);
 		}
 	}
-
+//Determina il tipo di contenuto di un file in base alla sua estensione (HTML, CSS, JavaScript, immagine, ecc
 	private static String getContentType(String fileName) {
 		if (fileName.endsWith(".html")) {
 			return "text/html";
