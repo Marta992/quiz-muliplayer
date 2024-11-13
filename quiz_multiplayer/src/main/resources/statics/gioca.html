@@ -37,28 +37,51 @@
             <div id="score" class="mt-4" style="display: none;">Punteggio: <span id="scoreValue">0</span></div>
             <button id="playAgainBtn" class="btn btn-success btn-lg mt-4 mx-auto" style="display: none;">Gioca di nuovo</button>
         </div>
+        
     </div>
 
+	<table class="table table-primary" hidden>
+		<thead>
+			<tr>
+				<th scope="col">questionText</th>
+				<th scope="col">correctOption</th>
+				<th scope="col">otherOption1</th>
+				<th scope="col">otherOption2</th>
+				<th scope="col">otherOption3</th>
+			</tr>
+		</thead>
+		<tbody id="questions"></tbody>
+	</table>
+	
+	<form id="scoreForm" action="/submitScore" method="POST" style="display: none;">
+	    <input id="nickname" type="hidden" name="nickname" value="NONE">
+	    <input type="hidden" name="score" id="finalScore">
+	</form>
+
     <script>
-        const questions = [
-            {
-                question: "Qual è la capitale d'Italia?",
-                choices: ["Roma", "Milano", "Napoli", "Torino"],
-                correctAnswer: 0
-            },
-            {
-                question: "Quale pianeta è conosciuto come il Pianeta Rosso?",
-                choices: ["Marte", "Venere", "Giove", "Saturno"],
-                correctAnswer: 0
-            },
+		let questions = [
             // Aggiungi altre domande o caricale da un backend in futuro
         ];
+		handleQuestions();
 
         let currentQuestionIndex = 0;
         let score = 0;
         let timeLeft = 10;
         let timerInterval;
         let hasAnswered = false;
+        
+        function handleQuestions(){
+			questions = [];
+			const questionsRaws = document.getElementById("questions").childNodes
+			questionsRaws.forEach(questionsRaw => {
+				const questionCells = questionsRaw.childNodes
+				questions.push({
+					question: questionCells[0].innerHTML,
+	                choices: [questionCells[1].innerHTML, questionCells[2].innerHTML, questionCells[3].innerHTML, questionCells[4].innerHTML].sort(() => Math.random() - 0.5),
+	                correctAnswer: questionCells[1].innerHTML
+				});
+			});
+		}
 
         // Funzione per caricare una domanda
         function loadQuestion() {
@@ -73,11 +96,11 @@
 
             const answerOptions = document.getElementById("answerOptions");
             answerOptions.innerHTML = ""; // Pulisce le opzioni precedenti
-            questionData.choices.forEach((choice, index) => {
+            questionData.choices.forEach(choice => {
                 const button = document.createElement("button");
                 button.className = "btn btn-outline-light btn-block my-2";
                 button.textContent = choice;
-                button.onclick = () => checkAnswer(button, index);
+                button.onclick = () => checkAnswer(button, choice, questionData.correctAnswer);
                 answerOptions.appendChild(button);
             });
 
@@ -98,7 +121,7 @@
         }
 
         // Funzione per controllare la risposta
-        function checkAnswer(button, selectedIndex) {
+        function checkAnswer(button, choice, correctAnswer) {
             if (hasAnswered) return; // Previene risposte multiple per la stessa domanda
 
             hasAnswered = true;
@@ -111,10 +134,9 @@
             }
             button.classList.add("selected-answer"); // Evidenzia l'opzione selezionata
 
-            const questionData = questions[currentQuestionIndex];
-            if (selectedIndex === questionData.correctAnswer && timeLeft > 0) {
-                score++;
-            }
+            if(choice == correctAnswer){
+				score++;
+			}
             document.getElementById("scoreValue").textContent = score;
         }
 
@@ -136,6 +158,11 @@
             document.getElementById("nextQuestionBtn").style.display = "none";
             document.getElementById("score").innerHTML = `Punteggio finale: <span id="scoreValue">${score}</span>`;
             document.getElementById("playAgainBtn").style.display = "block";
+            
+            const nickname = localStorage.getItem("nickname");
+			document.getElementById("nickname").value = nickname;
+            document.getElementById("finalScore").value = score;
+    		document.getElementById("scoreForm").submit();
         }
 
         // Funzione per avviare il gioco al click su "Inizia Gioco"
@@ -150,14 +177,7 @@
 
         // Funzione per ripristinare il gioco
         function resetGame() {
-            currentQuestionIndex = 0;
-            score = 0;
-            timeLeft = 10;
-            document.getElementById("playAgainBtn").style.display = "none";
-            document.getElementById("timer").style.display = "block";
-            document.getElementById("nextQuestionBtn").style.display = "block";
-            document.getElementById("scoreValue").textContent = score;
-            loadQuestion();
+			window.location.href = "gioca_gestore.html";
         }
 
         // Assegna eventi ai pulsanti

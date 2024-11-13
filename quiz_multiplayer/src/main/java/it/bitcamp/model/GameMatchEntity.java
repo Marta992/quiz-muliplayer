@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 @Entity
 @Table(name = "GAME_MATCH")
 public class GameMatchEntity {
@@ -23,6 +25,7 @@ public class GameMatchEntity {
     @Column(name = "SCORE")
     private int score; 
     
+    @CreationTimestamp
     @Column(name = "DATE_PLAYED")
     private LocalDateTime datePlayed; 
 

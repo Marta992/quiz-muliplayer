@@ -41,7 +41,6 @@ public class GameMatchDAO {
 			match = new GameMatchEntity();
 			match.setNickname(nickname);
 			match.setScore(score);
-
 			// salviamo utente sul database e ci faccioamo tornare il valore dell id
 			matchId = (Integer) session.save(match);
 			PlayerEntity player = session.get(PlayerEntity.class, nickname);

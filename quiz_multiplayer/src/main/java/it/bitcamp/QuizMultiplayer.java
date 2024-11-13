@@ -8,7 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,6 +40,9 @@ public class QuizMultiplayer {
 		server.createContext("/question-delete", new DeleteQuestionFormHandler());
 		server.createContext("/punteggi_gestore", new AdminScoresHandler());
 		server.createContext("/punteggi", new ScoresHandler());
+		server.createContext("/gioca_gestore", new AdminGameHandler());
+		server.createContext("/gioca", new GameHandler());
+		server.createContext("/submitScore", new AddScoreHandler());
 		server.start();
 		System.out.println("Server avviato su porta 8080");
 	}
@@ -86,7 +92,7 @@ public class QuizMultiplayer {
 				if (player != null && player.isAdmin()) {
 					redirectToCreatorPage(exchange);
 				} else if (player != null && !player.isAdmin()) {
-					redirectTo(exchange, "/gioca.html");
+					gameHandler(exchange, "gioca.html");
 				} else {
 					redirectTo(exchange, "/accedi_errore.html");
 //                    response = "Invalid username or password.";
@@ -129,7 +135,7 @@ public class QuizMultiplayer {
 						redirectTo(exchange, "/iscriviti_errore.html");
 					} else {
 						playerDao.addPlayer(nickname, password);
-						redirectTo(exchange, "/gioca.html");
+						gameHandler(exchange, "gioca.html");
 					}
 				}
 			} else {
@@ -168,13 +174,8 @@ public class QuizMultiplayer {
 				String otherOption2 = formatString(parameters.get("otherOption2"));
 				String otherOption3 = formatString(parameters.get("otherOption3"));
 
-				if (
-					questionText == null ||
-					correctOption == null ||
-					otherOption1 == null ||
-					otherOption2 == null ||
-					otherOption3 == null 
-				) {
+				if (questionText == null || correctOption == null || otherOption1 == null || otherOption2 == null
+						|| otherOption3 == null) {
 					response400(exchange, "Tutti i campi sono obbligatori");
 				} else {
 					QuestionDAO questionDAO = new QuestionDAO();
@@ -212,7 +213,7 @@ public class QuizMultiplayer {
 			}
 		}
 	}
-	
+
 	// HANDLER PUNTEGGI GESTORE
 	static class AdminScoresHandler implements HttpHandler {
 		@Override
@@ -220,12 +221,52 @@ public class QuizMultiplayer {
 			scoreHandler(exchange, "punteggi_gestore.html");
 		}
 	}
-	
+
 	// HANDLER PUNTEGGI NON GESTORE
 	static class ScoresHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			scoreHandler(exchange, "punteggi.html");
+		}
+	}
+
+	// HANDLER PUNTEGGI GESTORE
+	static class AdminGameHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			gameHandler(exchange, "gioca_gestore.html");
+		}
+	}
+
+	// HANDLER PUNTEGGI NON GESTORE
+	static class GameHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			gameHandler(exchange, "gioca.html");
+		}
+	}
+
+	// HANDLER LOGIN
+	static class AddScoreHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			if ("POST".equals(exchange.getRequestMethod())) {
+				// Leggi i dati dal form
+				InputStream inputStream = exchange.getRequestBody();
+				String formData = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+				// Elabora i parametri
+				Map<String, String> parameters = parseFormData(formData);
+				String nickname = parameters.get("nickname");
+				int score = Integer.parseInt(parameters.get("score"));
+
+				GameMatchDAO gameMatchDAO = new GameMatchDAO();
+				gameMatchDAO.addGameMatch(nickname, score);
+				exchange.sendResponseHeaders(204, -1); // -1 indica nessun contenuto di risposta
+	            exchange.close();
+			} else {
+				exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
+			}
 		}
 	}
 
@@ -237,38 +278,38 @@ public class QuizMultiplayer {
 				GameMatchDAO gameMatchDAO = new GameMatchDAO();
 				String htmlContent = new String(Files.readAllBytes(filePath));
 				StringBuilder questionTableHtml = new StringBuilder();
-				
-				//DAILY SCORES
+
+				DateTimeFormatter inputFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+		        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss");
+				// DAILY SCORES
 				List<GameMatchEntity> dailyScores = gameMatchDAO.getDailyGameMatch();
+				Collections.reverse(dailyScores);
 				questionTableHtml.append("<tbody id=\"daily-scores\">");
 				for (GameMatchEntity dailyScore : dailyScores) {
-					questionTableHtml
-							.append("<tr>")
-							.append("<td>").append(dailyScore.getNickname()).append("</td>")
-							.append("<td>").append(dailyScore.getScore()).append("</td>")
-							.append("<td>").append(dailyScore.getDatePlayed().toString().replaceAll("T", " ")).append("</td>")
+					questionTableHtml.append("<tr>").append("<td>").append(dailyScore.getNickname()).append("</td>")
+							.append("<td>").append(dailyScore.getScore()).append("</td>").append("<td>")
+							.append(LocalDateTime.parse(dailyScore.getDatePlayed().toString(), inputFormatter).format(outputFormatter)).append("</td>")
 							.append("</tr>");
 				}
 				questionTableHtml.append("</tbody>");
 				// Sostituisco il segnaposto con la lista di domande
 				htmlContent = htmlContent.replace("<tbody id=\"daily-scores\"></tbody>", questionTableHtml.toString());
-				
-				//TOTAL SCORES
+
+				// TOTAL SCORES
 				List<GameMatchEntity> allScores = gameMatchDAO.getAllGameMatch();
+				Collections.reverse(allScores);
 				questionTableHtml = new StringBuilder();
 				questionTableHtml.append("<tbody id=\"all-scores\">");
 				for (GameMatchEntity score : allScores) {
-					questionTableHtml
-							.append("<tr>")
-							.append("<td>").append(score.getNickname()).append("</td>")
-							.append("<td>").append(score.getScore()).append("</td>")
-							.append("<td>").append(score.getDatePlayed().toString().replaceAll("T", " ")).append("</td>")
+					questionTableHtml.append("<tr>").append("<td>").append(score.getNickname()).append("</td>")
+							.append("<td>").append(score.getScore()).append("</td>").append("<td>")
+							.append(LocalDateTime.parse(score.getDatePlayed().toString(), inputFormatter).format(outputFormatter)).append("</td>")
 							.append("</tr>");
 				}
 				questionTableHtml.append("</tbody>");
 				// Sostituisco il segnaposto con la lista di domande
 				htmlContent = htmlContent.replace("<tbody id=\"all-scores\"></tbody>", questionTableHtml.toString());
-				
+
 				exchange.getResponseHeaders().set("Content-Type", "text/html");
 				exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
 				try (OutputStream os = exchange.getResponseBody()) {
@@ -279,6 +320,37 @@ public class QuizMultiplayer {
 			}
 		} else {
 			exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
+		}
+	}
+
+	private static void gameHandler(HttpExchange exchange, String fileRequested) throws IOException {
+		// Definisci la cartella dei file statici
+		Path filePath = Paths.get("src/main/resources/statics", fileRequested);
+		if (Files.exists(filePath)) {
+			QuestionDAO questionDAO = new QuestionDAO();
+			String htmlContent = new String(Files.readAllBytes(filePath));
+			StringBuilder questionTableHtml = new StringBuilder();
+
+			// DAILY SCORES
+			List<QuestionEntity> questions = questionDAO.getRandomQuestions(10);
+			questionTableHtml.append("<tbody id=\"questions\">");
+			for (QuestionEntity question : questions) {
+				questionTableHtml.append("<tr>").append("<td>").append(question.getQuestionText()).append("</td>")
+						.append("<td>").append(question.getCorrectOption()).append("</td>").append("<td>")
+						.append(question.getOtherOption1()).append("</td>").append("<td>")
+						.append(question.getOtherOption2()).append("</td>").append("<td>")
+						.append(question.getOtherOption3()).append("</td>").append("</tr>");
+			}
+			questionTableHtml.append("</tbody>");
+			// Sostituisco il segnaposto con la lista di domande
+			htmlContent = htmlContent.replace("<tbody id=\"questions\"></tbody>", questionTableHtml.toString());
+			exchange.getResponseHeaders().set("Content-Type", "text/html");
+			exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
+			try (OutputStream os = exchange.getResponseBody()) {
+				os.write(htmlContent.getBytes());
+			}
+		} else {
+			response404(exchange);
 		}
 	}
 
@@ -338,7 +410,7 @@ public class QuizMultiplayer {
 		}
 		return response;
 	}
-	
+
 	private static String redirectToCreatorPage(HttpExchange exchange) throws IOException {
 		// Definisci la cartella dei file statici
 		Path filePath = Paths.get("src/main/resources/statics", "/creatore.html");
@@ -349,8 +421,8 @@ public class QuizMultiplayer {
 			StringBuilder questionTableHtml = new StringBuilder();
 			questionTableHtml.append("<tbody>");
 			for (QuestionEntity question : questions) {
-				questionTableHtml.append("<tr>").append("<td>").append(question.getId()).append("</td>")
-						.append("<td>").append(question.getQuestionText()).append("</td>").append("<td>")
+				questionTableHtml.append("<tr>").append("<td>").append(question.getId()).append("</td>").append("<td>")
+						.append(question.getQuestionText()).append("</td>").append("<td>")
 						.append(question.getCorrectOption()).append("</td>").append("</tr>");
 			}
 			questionTableHtml.append("</tbody>");
@@ -369,15 +441,9 @@ public class QuizMultiplayer {
 			return response404(exchange);
 		}
 	}
-	
+
 	private static String formatString(String string) {
-		return string.trim()
-				.replaceAll("%3A", ":")
-				.replaceAll("%3B", ";")
-				.replaceAll("%3F", "?")
-				.replaceAll("%2C", ",")
-				.replaceAll("%21", "!")
-				.replaceAll("\\+", " ")
-				;
+		return string.trim().replaceAll("%3A", ":").replaceAll("%3B", ";").replaceAll("%3F", "?").replaceAll("%2C", ",")
+				.replaceAll("%21", "!").replaceAll("\\+", " ");
 	}
 }
