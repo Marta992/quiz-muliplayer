@@ -63,13 +63,13 @@
 		
 		<!-- Form per rimuovere una domanda -->
         <h3 class="mt-5">Rimuovi una domanda</h3>
-        <form action="/question-delete" method="post">
+        <form action="/question-delete" method="POST">
 			<div class="form-group">
                 <label for="questionId">ID della domanda da rimuovere:</label>
-                <input id="questionId" type="text" name="questionId" class="form-control" minlength="1" maxlength="100" placeholder="Clicca la riga della domanda che vuoi cancellare" disabled>
+                <input id="questionId" type="number" name="questionId" class="form-control" minlength="1" maxlength="100" placeholder="Clicca la riga della domanda che vuoi cancellare" required>
             </div>
 
-			<button id="removeQuestionButton" type="submit" class="btn btn-danger btn-block my-3" disabled>Rimuovi</button>
+			<button id="removeQuestionButton" type="submit" class="btn btn-danger btn-block my-3">Rimuovi</button>
         </form>
     </div>
 
@@ -88,6 +88,7 @@
 		
 		            // Popola il campo input con l'ID della domanda
 		            questionIdInput.value = questionId;
+		            questionId.disabled = false;
 					removeQuestionButton.disabled = false;
 		        });
 		    });

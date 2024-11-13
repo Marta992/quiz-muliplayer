@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ public class QuizMultiplayer {
 		server.createContext("/", new StaticFileHandler());
 		server.createContext("/login", new LoginFormHandler());
 		server.createContext("/sign-up", new SignUpFormHandler());
-		server.createContext("/creatore", new CreatorFormHandler());
+		server.createContext("/creatore", new CreatorHandler());
 		server.createContext("/question-create", new CreateQuestionFormHandler());
 		server.createContext("/question-delete", new DeleteQuestionFormHandler());
 		server.start();
@@ -125,12 +124,11 @@ public class QuizMultiplayer {
 				} else {
 					PlayerDAO playerDao = new PlayerDAO();
 					PlayerEntity existingPlayer = playerDao.getPlayer(nickname);
-					String response;
 					if (existingPlayer != null) {
-						response = redirectTo(exchange, "/iscriviti_errore.html");
+						redirectTo(exchange, "/iscriviti_errore.html");
 					} else {
 						playerDao.addPlayer(nickname, password);
-						response = redirectTo(exchange, "/gioca.html");
+						redirectTo(exchange, "/gioca.html");
 					}
 				}
 			} else {
@@ -140,38 +138,12 @@ public class QuizMultiplayer {
 	}
 
 	// HANDLER CREATOR
-	static class CreatorFormHandler implements HttpHandler {
+	static class CreatorHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			if ("GET".equals(exchange.getRequestMethod())) {
-				String requestedFile = exchange.getRequestURI().getPath();
 				// Definisci la cartella dei file statici
-				Path filePath = Paths.get("src/main/resources/statics", "/creatore.html");
-				if (Files.exists(filePath)) {
-					QuestionDAO questionDAO = new QuestionDAO();
-					List<QuestionEntity> questions = questionDAO.getAllQuestion();
-					String htmlContent = new String(Files.readAllBytes(filePath));
-					StringBuilder questionTableHtml = new StringBuilder();
-					questionTableHtml.append("<tbody>");
-					for (QuestionEntity question : questions) {
-						questionTableHtml.append("<tr>").append("<td>").append(question.getId()).append("</td>")
-								.append("<td>").append(question.getQuestionText()).append("</td>").append("<td>")
-								.append(question.getCorrectOption()).append("</td>").append("</tr>");
-					}
-					questionTableHtml.append("</tbody>");
-
-					// Sostituisci il segnaposto con la lista di domande
-					htmlContent = htmlContent.replace("<tbody></tbody>", questionTableHtml.toString());
-
-//                    byte[] fileContent = Files.readAllBytes(filePath);
-					exchange.getResponseHeaders().set("Content-Type", "text/html");
-					exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
-					try (OutputStream os = exchange.getResponseBody()) {
-						os.write(htmlContent.getBytes());
-					}
-				} else {
-					response404(exchange);
-				}
+				redirectToCreatorPage(exchange);
 			} else {
 				exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
 			}
@@ -194,7 +166,6 @@ public class QuizMultiplayer {
 				String otherOption1 = formatString(parameters.get("otherOption1"));
 				String otherOption2 = formatString(parameters.get("otherOption2"));
 				String otherOption3 = formatString(parameters.get("otherOption3"));
-				
 
 				if (
 					questionText == null ||
@@ -207,7 +178,7 @@ public class QuizMultiplayer {
 				} else {
 					QuestionDAO questionDAO = new QuestionDAO();
 					questionDAO.addQuestion(questionText, correctOption, otherOption1, otherOption2, otherOption3);
-					redirectTo(exchange, "/creatore.html");
+					redirectToCreatorPage(exchange);
 				}
 			} else {
 				exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
@@ -233,7 +204,7 @@ public class QuizMultiplayer {
 				} else {
 					QuestionDAO questionDAO = new QuestionDAO();
 					questionDAO.deleteQuestion(Integer.parseInt(questionId));
-					redirectTo(exchange, "/creatore.html");
+					redirectToCreatorPage(exchange);
 				}
 			} else {
 				exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
@@ -296,6 +267,36 @@ public class QuizMultiplayer {
 			os.write(response.getBytes());
 		}
 		return response;
+	}
+	
+	private static void redirectToCreatorPage(HttpExchange exchange) throws IOException {
+		// Definisci la cartella dei file statici
+		Path filePath = Paths.get("src/main/resources/statics", "/creatore.html");
+		if (Files.exists(filePath)) {
+			QuestionDAO questionDAO = new QuestionDAO();
+			List<QuestionEntity> questions = questionDAO.getAllQuestion();
+			String htmlContent = new String(Files.readAllBytes(filePath));
+			StringBuilder questionTableHtml = new StringBuilder();
+			questionTableHtml.append("<tbody>");
+			for (QuestionEntity question : questions) {
+				questionTableHtml.append("<tr>").append("<td>").append(question.getId()).append("</td>")
+						.append("<td>").append(question.getQuestionText()).append("</td>").append("<td>")
+						.append(question.getCorrectOption()).append("</td>").append("</tr>");
+			}
+			questionTableHtml.append("</tbody>");
+
+			// Sostituisci il segnaposto con la lista di domande
+			htmlContent = htmlContent.replace("<tbody></tbody>", questionTableHtml.toString());
+
+//            byte[] fileContent = Files.readAllBytes(filePath);
+			exchange.getResponseHeaders().set("Content-Type", "text/html");
+			exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
+			try (OutputStream os = exchange.getResponseBody()) {
+				os.write(htmlContent.getBytes());
+			}
+		} else {
+			response404(exchange);
+		}
 	}
 	
 	private static String formatString(String string) {
