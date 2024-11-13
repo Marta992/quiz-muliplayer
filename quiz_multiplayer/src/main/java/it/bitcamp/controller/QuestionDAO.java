@@ -108,7 +108,7 @@ public class QuestionDAO {
 	    List<QuestionEntity> questions = null;
 	    try {
 	        tx = session.beginTransaction();
-	        // Query  getRandomQuestions(5) per ottenere una lista di 5 domande casuali, o un altro numero passato come argomento.
+	        // hql Query  getRandomQuestions(5) per ottenere una lista di 5 domande casuali, o un altro numero passato come argomento.
 	        Query<QuestionEntity> query = session.createQuery("FROM QuestionEntity ORDER BY RAND()", QuestionEntity.class);
 	        query.setMaxResults(numQuestions); // Limita il numero di risultati al valore desiderato
 	        questions = query.list();
