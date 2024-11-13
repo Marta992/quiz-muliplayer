@@ -17,8 +17,10 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import it.bitcamp.controller.GameMatchDAO;
 import it.bitcamp.controller.PlayerDAO;
 import it.bitcamp.controller.QuestionDAO;
+import it.bitcamp.model.GameMatchEntity;
 import it.bitcamp.model.PlayerEntity;
 import it.bitcamp.model.QuestionEntity;
 
@@ -33,6 +35,8 @@ public class QuizMultiplayer {
 		server.createContext("/creatore", new CreatorHandler());
 		server.createContext("/question-create", new CreateQuestionFormHandler());
 		server.createContext("/question-delete", new DeleteQuestionFormHandler());
+		server.createContext("/punteggi_gestore", new AdminScoresHandler());
+		server.createContext("/punteggi", new ScoresHandler());
 		server.start();
 		System.out.println("Server avviato su porta 8080");
 	}
@@ -76,19 +80,16 @@ public class QuizMultiplayer {
 				String nickname = parameters.get("nickname");
 				String password = parameters.get("password");
 
-				String response;
 				PlayerDAO playerDAO = new PlayerDAO();
 				PlayerEntity player = playerDAO.loginPlayer(nickname, password);
 
-				if (player != null) {
-					response = redirectTo(exchange, player.isAdmin() ? "/creatore.html" : "/gioca.html");
+				if (player != null && player.isAdmin()) {
+					redirectToCreatorPage(exchange);
+				} else if (player != null && !player.isAdmin()) {
+					redirectTo(exchange, "/gioca.html");
 				} else {
-					response = redirectTo(exchange, "/accedi_errore.html");
+					redirectTo(exchange, "/accedi_errore.html");
 //                    response = "Invalid username or password.";
-				}
-				exchange.sendResponseHeaders(200, response.getBytes().length);
-				try (OutputStream os = exchange.getResponseBody()) {
-					os.write(response.getBytes());
 				}
 			} else {
 				exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
@@ -211,6 +212,75 @@ public class QuizMultiplayer {
 			}
 		}
 	}
+	
+	// HANDLER PUNTEGGI GESTORE
+	static class AdminScoresHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			scoreHandler(exchange, "punteggi_gestore.html");
+		}
+	}
+	
+	// HANDLER PUNTEGGI NON GESTORE
+	static class ScoresHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+			scoreHandler(exchange, "punteggi.html");
+		}
+	}
+
+	private static void scoreHandler(HttpExchange exchange, String fileRequested) throws IOException {
+		if ("GET".equals(exchange.getRequestMethod())) {
+			// Definisci la cartella dei file statici
+			Path filePath = Paths.get("src/main/resources/statics", fileRequested);
+			if (Files.exists(filePath)) {
+				GameMatchDAO gameMatchDAO = new GameMatchDAO();
+				String htmlContent = new String(Files.readAllBytes(filePath));
+				StringBuilder questionTableHtml = new StringBuilder();
+				
+				//DAILY SCORES
+				List<GameMatchEntity> dailyScores = gameMatchDAO.getDailyGameMatch();
+				questionTableHtml.append("<tbody id=\"daily-scores\">");
+				for (GameMatchEntity dailyScore : dailyScores) {
+					questionTableHtml
+							.append("<tr>")
+							.append("<td>").append(dailyScore.getNickname()).append("</td>")
+							.append("<td>").append(dailyScore.getScore()).append("</td>")
+							.append("<td>").append(dailyScore.getDatePlayed().toString().replaceAll("T", " ")).append("</td>")
+							.append("</tr>");
+				}
+				questionTableHtml.append("</tbody>");
+				// Sostituisco il segnaposto con la lista di domande
+				htmlContent = htmlContent.replace("<tbody id=\"daily-scores\"></tbody>", questionTableHtml.toString());
+				
+				//TOTAL SCORES
+				List<GameMatchEntity> allScores = gameMatchDAO.getAllGameMatch();
+				questionTableHtml = new StringBuilder();
+				questionTableHtml.append("<tbody id=\"all-scores\">");
+				for (GameMatchEntity score : allScores) {
+					questionTableHtml
+							.append("<tr>")
+							.append("<td>").append(score.getNickname()).append("</td>")
+							.append("<td>").append(score.getScore()).append("</td>")
+							.append("<td>").append(score.getDatePlayed().toString().replaceAll("T", " ")).append("</td>")
+							.append("</tr>");
+				}
+				questionTableHtml.append("</tbody>");
+				// Sostituisco il segnaposto con la lista di domande
+				htmlContent = htmlContent.replace("<tbody id=\"all-scores\"></tbody>", questionTableHtml.toString());
+				
+				exchange.getResponseHeaders().set("Content-Type", "text/html");
+				exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
+				try (OutputStream os = exchange.getResponseBody()) {
+					os.write(htmlContent.getBytes());
+				}
+			} else {
+				response404(exchange);
+			}
+		} else {
+			exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
+		}
+	}
 
 	private static String getContentType(String fileName) {
 		if (fileName.endsWith(".html")) {
@@ -269,7 +339,7 @@ public class QuizMultiplayer {
 		return response;
 	}
 	
-	private static void redirectToCreatorPage(HttpExchange exchange) throws IOException {
+	private static String redirectToCreatorPage(HttpExchange exchange) throws IOException {
 		// Definisci la cartella dei file statici
 		Path filePath = Paths.get("src/main/resources/statics", "/creatore.html");
 		if (Files.exists(filePath)) {
@@ -294,8 +364,9 @@ public class QuizMultiplayer {
 			try (OutputStream os = exchange.getResponseBody()) {
 				os.write(htmlContent.getBytes());
 			}
+			return "200 OK";
 		} else {
-			response404(exchange);
+			return response404(exchange);
 		}
 	}
 	

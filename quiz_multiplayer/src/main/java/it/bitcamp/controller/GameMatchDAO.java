@@ -1,6 +1,7 @@
 package it.bitcamp.controller;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -95,11 +96,10 @@ public class GameMatchDAO {
 			tx = session.beginTransaction();
 
 			// Otteniamo la data odierna senza l'orario
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			String today = sdf.format(new Date());
+			Date today = new Date();
 
 			// Creiamo una query per ottenere i punteggi di oggi
-			String hql = "SELECT m FROM GameMatchEntity m WHERE DATE(m.timestamp) = :today";
+			String hql = "SELECT m FROM GameMatchEntity m WHERE DATE(m.datePlayed) = :today";
 
 			Query<GameMatchEntity> query = session.createQuery(hql, GameMatchEntity.class);
 			query.setParameter("today", today);
