@@ -9,7 +9,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
 import it.bitcamp.model.QuestionEntity;
-import old.Question;
 
 public class QuestionDAO {
 	private static SessionFactory factory;
@@ -24,7 +23,7 @@ public class QuestionDAO {
 		}
 	}
 	
-	public Integer addQuestion(String questionText, String option1, String option2, String option3, String option4, int correctOption) {
+	public Integer addQuestion(String questionText, String correctOption, String otherOption1, String otherOption2, String otherOption3) {
 		Session session = factory.openSession();
 		Transaction tx = null;
 		QuestionEntity question = null;
@@ -35,10 +34,10 @@ public class QuestionDAO {
 			// creazione di una istanza della classe question
 			question = new QuestionEntity();
 			question.setQuestionText(questionText);
-			question.setCorrectOption(option1);
-			question.setOtherOption1(option2);
-			question.setOtherOption2(option3);
-			question.setOtherOption3(option4);
+			question.setCorrectOption(correctOption);
+			question.setOtherOption1(otherOption1);
+			question.setOtherOption2(otherOption2);
+			question.setOtherOption3(otherOption3);
 
 			// salviamo domanda sul database e ci faccioamo tornare il valore dell id
 			questionId = (Integer) session.save(question);
@@ -66,7 +65,7 @@ public class QuestionDAO {
 		try {
 			tx = session.beginTransaction();
 			// otteniamo la domanda dal database usando questionid
-			Question question = session.get(Question.class, questionId);
+			QuestionEntity question = session.get(QuestionEntity.class, questionId);
 			// elimina la domanda
 			session.delete(question);
 			tx.commit();
@@ -81,14 +80,14 @@ public class QuestionDAO {
 		}
 	}
 	
-	public List<Question> getAllQuestion() {
+	public List<QuestionEntity> getAllQuestion() {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		List<Question> questions = null;
+		List<QuestionEntity> questions = null;
 		try {
 			tx = session.beginTransaction();
 			//otteniamo tutte le domande QUERY
-			questions = session.createQuery("FROM Question", Question.class).list();
+			questions = session.createQuery("FROM QuestionEntity", QuestionEntity.class).list();
 			tx.commit();
 			
 		} catch (Exception e) {
@@ -103,14 +102,14 @@ public class QuestionDAO {
 	}
 	
 	//getRandomQuestions
-	public List<Question> getRandomQuestions(int numQuestions) {
+	public List<QuestionEntity> getRandomQuestions(int numQuestions) {
 	    Session session = factory.openSession();
 	    Transaction tx = null;
-	    List<Question> questions = null;
+	    List<QuestionEntity> questions = null;
 	    try {
 	        tx = session.beginTransaction();
 	        // Query  getRandomQuestions(5) per ottenere una lista di 5 domande casuali, o un altro numero passato come argomento.
-	        Query<Question> query = session.createQuery("FROM Question ORDER BY RAND()", Question.class);
+	        Query<QuestionEntity> query = session.createQuery("FROM QuestionEntity ORDER BY RAND()", QuestionEntity.class);
 	        query.setMaxResults(numQuestions); // Limita il numero di risultati al valore desiderato
 	        questions = query.list();
 	        tx.commit();

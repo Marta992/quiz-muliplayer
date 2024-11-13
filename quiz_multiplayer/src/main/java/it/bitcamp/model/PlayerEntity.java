@@ -16,7 +16,7 @@ public class PlayerEntity {
     @Column(name = "PASSWORD_HASH")
     private String passwordHash;
     
-    @Column(name = "ADMIN")
+    @Column(name = "IS_ADMIN")
     private boolean admin;
 
     @Column(name = "TOTAL_SCORE")

@@ -81,7 +81,7 @@ public class PlayerDAO {
 		if(player != null && BCrypt.checkpw(password, player.getPasswordHash())) {
 			return player;
 		}
-		return player;
+		return null;
 	}
 
 }

@@ -1,7 +1,6 @@
 package it.bitcamp.controller;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,10 +11,10 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
-import it.bitcamp.model.MatchEntity;
+import it.bitcamp.model.GameMatchEntity;
 import it.bitcamp.model.PlayerEntity;
 
-public class MatchDAO {
+public class GameMatchDAO {
 	
 	private static SessionFactory factory;
 	
@@ -29,19 +28,18 @@ public class MatchDAO {
 		}
 	}
 
-	public Integer addMatch(String nickname, int score, LocalDateTime timestamp) {
+	public Integer addGameMatch(String nickname, int score) {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		MatchEntity match = null;
+		GameMatchEntity match = null;
 		Integer matchId = null;
 		try {
 			// inizio della transazione garantendo l'integrita dei dati
 			tx = session.beginTransaction();
 			// creazione di una istanza della classe user
-			match = new MatchEntity();
+			match = new GameMatchEntity();
 			match.setNickname(nickname);
 			match.setScore(score);
-			match.setTimestamp(timestamp);
 
 			// salviamo utente sul database e ci faccioamo tornare il valore dell id
 			matchId = (Integer) session.save(match);
@@ -67,14 +65,14 @@ public class MatchDAO {
 		return matchId;
 	}
 
-	public List<MatchEntity> getAllMatch() {
+	public List<GameMatchEntity> getAllGameMatch() {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		List<MatchEntity> matches = new ArrayList<>();
+		List<GameMatchEntity> matches = new ArrayList<>();
 		try {
 			tx = session.beginTransaction();
 			//otteniamo tutti gli utenti QUERY
-			matches = session.createQuery("FROM MatchEntity", MatchEntity.class).list();
+			matches = session.createQuery("FROM GameMatchEntity", GameMatchEntity.class).list();
 			tx.commit();
 			
 		} catch (Exception e) {
@@ -88,10 +86,10 @@ public class MatchDAO {
 		return matches;
 	}
 	
-	public List<MatchEntity> getDailyMatches() {
+	public List<GameMatchEntity> getDailyGameMatch() {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		List<MatchEntity> dailyMatches = null;
+		List<GameMatchEntity> dailyMatches = null;
 
 		try {
 			tx = session.beginTransaction();
@@ -101,9 +99,9 @@ public class MatchDAO {
 			String today = sdf.format(new Date());
 
 			// Creiamo una query per ottenere i punteggi di oggi
-			String hql = "SELECT m FROM MatchEntity m WHERE DATE(m.timestamp) = :today";
+			String hql = "SELECT m FROM GameMatchEntity m WHERE DATE(m.timestamp) = :today";
 
-			Query<MatchEntity> query = session.createQuery(hql, MatchEntity.class);
+			Query<GameMatchEntity> query = session.createQuery(hql, GameMatchEntity.class);
 			query.setParameter("today", today);
 
 			dailyMatches = query.list();

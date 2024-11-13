@@ -9,7 +9,7 @@
 </head>
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Quiz Multiplayer</a>
+        <a class="navbar-brand" href="#">Quiz Multiplayer - Accedi</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
             </ul>
@@ -20,11 +20,11 @@
             <h2>Accedi</h2>
             <div class="form-group">
                 <label for="nickname">Nickname:</label>
-                <input type="text" name="nickname" class="form-control" required>
+                <input type="text" name="nickname" class="form-control" minlength="3" maxlength="20" required>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" required>
+                <input type="password" name="password" class="form-control" minlength="8" maxlength="20" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Accedi</button>
             <p class="mt-3">Non hai un account? <a href="iscriviti.html">Iscriviti</a></p>

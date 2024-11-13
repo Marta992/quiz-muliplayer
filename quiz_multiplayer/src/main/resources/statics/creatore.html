@@ -12,93 +12,86 @@
         <a class="navbar-brand" href="#">Quiz Multiplayer - Gestione</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="gioca_gestore.html">Gioca</a></li>
+                <li class="nav-item"><a class="nav-link" href="punteggi_gestore.html">Punteggi</a></li>
+                <li class="nav-item active"><a class="nav-link" href="#">Gestisci</a></li>
                 <li class="nav-item"><a class="nav-link" href="accedi.html">Esci</a></li>
-                <li class="nav-item"><a class="nav-link" href="game.html">Gioca</a></li>
-                <li class="nav-item"><a class="nav-link" href="punteggi.html">Punteggi</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Modifiche gioco</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container my-5">
         <h2 class="text-center">Gestione Domande del Quiz</h2>
 
         <!-- Form per aggiungere una domanda -->
         <h3>Aggiungi una domanda</h3>
-        <form action="question" method="post">
-            <input type="hidden" name="action" value="add">
-            <label for="questionText">Domanda:</label>
-            <input type="text" name="questionText" required><br>
-
-            <label for="option1">Opzione 1:</label>
-            <input type="text" name="option1" required><br>
-
-            <label for="option2">Opzione 2:</label>
-            <input type="text" name="option2" required><br>
-
-            <label for="option3">Opzione 3:</label>
-            <input type="text" name="option3" required><br>
-
-            <label for="option4">Opzione 4:</label>
-            <input type="text" name="option4" required><br>
-
-            <label for="correctOption">Opzione corretta (1-4):</label>
-            <input type="number" name="correctOption" min="1" max="4" required><br>
-
+        <form action="/question-create" method="POST">
+			<div class="form-group">
+                <label for="questionText">Domanda:</label>
+                <input type="text" name="questionText" class="form-control" minlength="10" maxlength="255" required>
+            </div>
+            <div class="form-group">
+                <label for="correctOption">Risposta corretta:</label>
+                <input type="text" name="correctOption" class="form-control" minlength="1" maxlength="100" required>
+            </div>
+            <div class="form-group">
+                <label for="otherOption1">Altra risposta 1:</label>
+                <input type="text" name="otherOption1" class="form-control" minlength="1" maxlength="100" required>
+            </div>
+            <div class="form-group">
+                <label for="otherOption2">Altra risposta 2:</label>
+                <input type="text" name="otherOption2" class="form-control" minlength="1" maxlength="100" required>
+            </div>
+            <div class="form-group">
+                <label for="otherOption3">Altra risposta 3:</label>
+                <input type="text" name="otherOption3" class="form-control" minlength="1" maxlength="100" required>
+            </div>
             <button type="submit" class="btn btn-success btn-block">Aggiungi</button>
         </form>
 
-        <!-- Form per rimuovere una domanda -->
-        <h3 class="mt-5">Rimuovi una domanda</h3>
-        <form action="question" method="post">
-            <input type="hidden" name="action" value="delete">
-            <label for="questionId">ID della domanda da rimuovere:</label>
-            <input type="number" name="questionId" required><br>
-
-            <button type="submit" class="btn btn-danger btn-block mt-2">Rimuovi</button>
-        </form>
-
         <h3 class="mt-5">Domande Esistenti</h3>
-        <ul id="questionList" class="list-group mt-3">
-            <!-- Le domande esistenti saranno mostrate qui -->
-        </ul>
+        <table class="table table-primary">
+			<thead>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Domanda</th>
+					<th scope="col">Risposta corretta</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		
+		<!-- Form per rimuovere una domanda -->
+        <h3 class="mt-5">Rimuovi una domanda</h3>
+        <form action="/question-delete" method="post">
+			<div class="form-group">
+                <label for="questionId">ID della domanda da rimuovere:</label>
+                <input id="questionId" type="text" name="questionId" class="form-control" minlength="1" maxlength="100" placeholder="Clicca la riga della domanda che vuoi cancellare" disabled>
+            </div>
+
+			<button id="removeQuestionButton" type="submit" class="btn btn-danger btn-block my-3" disabled>Rimuovi</button>
+        </form>
     </div>
 
-    <script>
-        const questionList = document.getElementById('questionList');
-
-        // Funzione per aggiungere una domanda alla lista (funzionalità lato client, per mostrare la domanda)
-        function addQuestion() {
-            const questionText = document.getElementById('questionText').value;
-            const options = Array.from(document.getElementsByClassName('answer-option')).map(input => input.value);
-            const correctAnswerIndex = document.getElementById('correctAnswer').value;
-
-            if (questionText && options.every(option => option.trim() !== "")) {
-                const questionItem = document.createElement('li');
-                questionItem.classList.add('list-group-item');
-                questionItem.innerHTML = `
-                        <strong>${questionText}</strong>
-                        <ul>
-                            ${options.map((option, index) => `
-                                <li${index == correctAnswerIndex ? ' class="text-success"' : ''}>${option}</li>`).join('')}
-                        </ul>
-                        <button class="btn btn-danger btn-sm mt-2" onclick="removeQuestion(this)">Rimuovi</button>
-                    `;
-                questionList.appendChild(questionItem);
-
-                // Reset del modulo
-                document.getElementById('questionForm').reset();
-            } else {
-                alert("Per favore, completa tutti i campi.");
-            }
-        }
-
-        // Funzione per rimuovere una domanda dalla lista (funzionalità lato client)
-        function removeQuestion(button) {
-            const questionItem = button.parentElement;
-            questionList.removeChild(questionItem);
-            // Logica per rimuovere la domanda dal database può essere aggiunta qui
-        }
-    </script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		    const questionIdInput = document.getElementById("questionId");
+		    const removeQuestionButton = document.getElementById("removeQuestionButton");
+		    // Seleziona tutte le righe della tabella
+		    const rows = document.querySelectorAll("table tbody tr");
+		
+		    // Aggiungi un evento di clic su ogni riga della tabella
+		    rows.forEach(row => {
+		        row.addEventListener("click", function() {
+		            // Ottieni il valore della prima cella (ID) della riga cliccata
+		            const questionId = row.cells[0].innerText;
+		
+		            // Popola il campo input con l'ID della domanda
+		            questionIdInput.value = questionId;
+					removeQuestionButton.disabled = false;
+		        });
+		    });
+		});
+	</script>
 </body>
 </html>

@@ -21,7 +21,8 @@
 <property name="hibernate.hbm2ddl.auto">update</property>
 
 <!-- specifica della mappatura delle classi -->
-<mapping class="it.bitcamp.model.User"/>
-
+<mapping class="it.bitcamp.model.PlayerEntity"/>
+<mapping class="it.bitcamp.model.GameMatchEntity"/>
+<mapping class="it.bitcamp.model.QuestionEntity"/>
 </session-factory>
 </hibernate-configuration>

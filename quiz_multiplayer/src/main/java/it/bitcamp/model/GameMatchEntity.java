@@ -9,8 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MATCH")
-public class MatchEntity {
+@Table(name = "GAME_MATCH")
+public class GameMatchEntity {
 
     @Id
     @Column(name = "ID")
@@ -23,17 +23,17 @@ public class MatchEntity {
     @Column(name = "SCORE")
     private int score; 
     
-    @Column(name = "TIMESTAMP")
-    private LocalDateTime timestamp; 
+    @Column(name = "DATE_PLAYED")
+    private LocalDateTime datePlayed; 
 
-    public MatchEntity() {}
+    public GameMatchEntity() {}
 
-	public MatchEntity(int id, String nickname, int score, LocalDateTime timestamp) {
+	public GameMatchEntity(int id, String nickname, int score, LocalDateTime datePlayed) {
 		super();
 		this.id = id;
 		this.nickname = nickname;
 		this.score = score;
-		this.timestamp = timestamp;
+		this.datePlayed = datePlayed;
 	}
 
 	public int getId() {
@@ -60,12 +60,12 @@ public class MatchEntity {
 		this.score = score;
 	}
 
-	public LocalDateTime getTimestamp() {
-		return timestamp;
+	public LocalDateTime getDatePlayed() {
+		return datePlayed;
 	}
 
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
+	public void setDatePlayed(LocalDateTime datePlayed) {
+		this.datePlayed = datePlayed;
 	}
     
 }

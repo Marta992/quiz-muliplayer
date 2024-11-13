@@ -19,9 +19,13 @@ h2 {
     color: #FFD700;
 }
 
-.btn-primary, .btn-success {
+.btn-primary, .btn-success, .btn-danger {
     font-size: 1.2em;
     font-weight: bold;
+}
+
+tbody tr {
+	cursor: pointer;
 }
 
 
