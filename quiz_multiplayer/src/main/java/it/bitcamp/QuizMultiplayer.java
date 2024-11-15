@@ -29,6 +29,8 @@ import it.bitcamp.model.QuestionEntity;
 
 @SuppressWarnings("restriction")
 public class QuizMultiplayer {
+	
+	private static final int NUMBER_OF_QUESTIONS = 3;
 
 	public static void main(String[] args) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -332,7 +334,7 @@ public class QuizMultiplayer {
 			StringBuilder questionTableHtml = new StringBuilder();
 
 			// DAILY SCORES
-			List<QuestionEntity> questions = questionDAO.getRandomQuestions(10);
+			List<QuestionEntity> questions = questionDAO.getRandomQuestions(NUMBER_OF_QUESTIONS);
 			questionTableHtml.append("<tbody id=\"questions\">");
 			for (QuestionEntity question : questions) {
 				questionTableHtml.append("<tr>").append("<td>").append(question.getQuestionText()).append("</td>")

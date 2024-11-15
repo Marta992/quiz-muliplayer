@@ -29,20 +29,25 @@ tbody tr {
 }
 
 .mt-custom{
-	margin-top: 200px;
+	margin-top: 70px;
 }
+
 #gameContainer {
 background:rgba(0, 0, 0, 0.6);
 border-radius: 15px;
+padding:10px;
 }
+
 #loginForm {
 background:rgba(0, 0, 0, 0.6);
 padding:10px;
 border-radius: 15px;
 }
+
 #registerForm {
 background:rgba(0, 0, 0, 0.6);
 padding:10px;
 border-radius: 15px;
 }
+
 

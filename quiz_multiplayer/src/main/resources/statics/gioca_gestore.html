@@ -27,6 +27,11 @@
     </nav>
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div id="gameContainer" class="w-75 p-4 text-center">
+	        <div id="textStartGame">
+	         	<h2>Pensi di sapere tutto sul mondo Harry Potter?</h2>
+	       	    <h4>Sfida i tuoi amici</h4>
+	            <h5>Rispondi a più domande possibili ma fai attenzione!Puoi dare una sola risposta ed entro lo scadere del tempo!!</h5>
+	        </div>
             <!-- Pulsante per iniziare il gioco -->
             <button id="startGameBtn" class="btn btn-primary btn-lg">Inizia Gioco</button>
 
@@ -170,6 +175,7 @@
 
         // Funzione per avviare il gioco al click su "Inizia Gioco"
         function startGame() {
+        	document.getElementById("textStartGame").style.display = "none";
             document.getElementById("startGameBtn").style.display = "none";
             document.getElementById("questionText").style.display = "block";
             document.getElementById("timer").style.display = "block";
